@@ -2,21 +2,19 @@
 #pragma newdecls required
 
 #include <sourcemod>
-#include <HudManager>
-#include <csgocolors_fix>
+#include <fys.huds>
 
 char g_sImage[PLATFORM_MAX_PATH];
 char input[PLATFORM_MAX_PATH];
 
 ConVar g_cvResendRate;
-float g_fResend;
 
 public Plugin myinfo =
 {
     name = "Send Images",
     author = "koen",
     description = "Send images in CS:GO center text",
-    version = "0.4",
+    version = "0.5",
     url = "https://github.com/notkoen"
 };
 
@@ -26,8 +24,6 @@ public void OnPluginStart()
     RegAdminCmd("sm_img2", Command_Image2, ADMFLAG_ROOT, "Send image in the middle hud element");
     
     g_cvResendRate = CreateConVar("sm_images_resend", "1.0", "Image resend time (Short times may cause caching issues)", _, true, 0.10);
-    g_fResend = g_cvResendRate.FloatValue;
-    HookConVarChange(g_cvResendRate, OnConvarChange);
     AutoExecConfig(true, "Send Images");
 }
 
@@ -37,12 +33,6 @@ public void OnMapStart()
     input = "";
 }
 
-public void OnConvarChange(Handle cvar, const char[] oldValue, const char[] newVaule)
-{
-    if (cvar == g_cvResendRate)
-        g_fResend = g_cvResendRate.FloatValue;
-}
-
 void SendImage(int style, const char[] image, int width = 800, int height = 800)
 {
     Format(g_sImage, sizeof(g_sImage), "<span><img width='%d' height='%d' src='%s'></span>", width, height, image);
@@ -50,16 +40,16 @@ void SendImage(int style, const char[] image, int width = 800, int height = 800)
     if (style == 1)
         PrintCenterTextAll(g_sImage);
     if (style == 2)
-        ShowHtmlHudAll(5.0, g_sImage, true);
+        Huds_ShowHtmlHudAll(5.0, g_sImage, true);
 
-    CreateTimer(g_fResend, ResendImage, style);
+    CreateTimer(g_cvResendRate.FloatValue, ResendImage, style);
 }
 
 public Action Command_Image(int client, int args)
 {
     if (args < 1)
     {
-        CPrintToChat(client, "{green}[IMAGES] {default}Usage: sm_img <link>");
+        PrintToChat(client, "\x04[IMAGES] \x01Usage: sm_img <link>");
         return Plugin_Handled;
     }
     
@@ -74,7 +64,7 @@ public Action Command_Image2(int client, int args)
 {
     if (args < 1)
     {
-        CPrintToChat(client, "{green}[IMAGES] {default}Usage: sm_img2 <link>");
+        PrintToChat(client, "\x04[IMAGES] \x01Usage: sm_img2 <link>");
         return Plugin_Handled;
     }
     
@@ -90,6 +80,6 @@ public Action ResendImage(Handle timer, int style)
     if (style == 1)
         PrintCenterTextAll(g_sImage);
     if (style == 2)
-        ShowHtmlHudAll(5.0, g_sImage, true);
+        Huds_ShowHtmlHudAll(5.0, g_sImage, true);
     return Plugin_Handled;
 }
