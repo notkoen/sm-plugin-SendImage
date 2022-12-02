@@ -14,7 +14,7 @@ public Plugin myinfo =
     name = "Send Images",
     author = "koen",
     description = "Send images in CS:GO center text",
-    version = "0.5",
+    version = "0.6",
     url = "https://github.com/notkoen"
 };
 
@@ -24,7 +24,7 @@ public void OnPluginStart()
     RegAdminCmd("sm_img2", Command_Image2, ADMFLAG_ROOT, "Send image in the middle hud element");
     
     g_cvResendRate = CreateConVar("sm_images_resend", "1.0", "Image resend time (Short times may cause caching issues)", _, true, 0.10);
-    AutoExecConfig(true, "Send Images");
+    AutoExecConfig(true, "SendImages");
 }
 
 public void OnMapStart()
@@ -37,10 +37,8 @@ void SendImage(int style, const char[] image, int width = 800, int height = 800)
 {
     Format(g_sImage, sizeof(g_sImage), "<span><img width='%d' height='%d' src='%s'></span>", width, height, image);
     
-    if (style == 1)
-        PrintCenterTextAll(g_sImage);
-    if (style == 2)
-        Huds_ShowHtmlHudAll(5.0, g_sImage, true);
+    if (style == 1) PrintCenterTextAll(g_sImage);
+    if (style == 2) Huds_ShowHtmlHudAll(5.0, g_sImage, true);
 
     CreateTimer(g_cvResendRate.FloatValue, ResendImage, style);
 }
@@ -64,7 +62,7 @@ public Action Command_Image2(int client, int args)
 {
     if (args < 1)
     {
-        PrintToChat(client, "\x04[IMAGES] \x01Usage: sm_img2 <link>");
+        PrintToChat(client, "\x04[Images] \x01Usage: sm_img2 <link>");
         return Plugin_Handled;
     }
     
@@ -77,9 +75,7 @@ public Action Command_Image2(int client, int args)
 
 public Action ResendImage(Handle timer, int style)
 {
-    if (style == 1)
-        PrintCenterTextAll(g_sImage);
-    if (style == 2)
-        Huds_ShowHtmlHudAll(5.0, g_sImage, true);
+    if (style == 1) PrintCenterTextAll(g_sImage);
+    if (style == 2) Huds_ShowHtmlHudAll(5.0, g_sImage, true);
     return Plugin_Handled;
 }
