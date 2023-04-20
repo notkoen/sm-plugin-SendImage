@@ -1,7 +1,7 @@
 
 # CSGO Send Images
 
-Send images in CS:GO via either center text or the middle HTML-supported HUD element. *Compiled in SM 1.11.6906*
+Send images in CS:GO via either center text or the middle HTML-supported HUD element.
 
 ## Dependency
 
